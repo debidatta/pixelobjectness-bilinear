@@ -1,6 +1,5 @@
 import pylab
 from skimage.io import imread
-from sklearn.cluster import KMeans
 from matplotlib import pyplot as plt
 import numpy as np
 import os
@@ -164,9 +163,6 @@ bs_params = {
 }
 
 def fit_samples(samples):
-    #kmeans = KMeans(n_clusters=2, random_state=0).fit(samples)
-    #ctr_fg = np.argmax(kmeans.cluster_centers_)
-    #fg =  kmeans.labels_ == ctr_fg
     gmm = mixture.GaussianMixture(n_components=2, covariance_type='full').fit(samples)
     labels = gmm.predict(samples)
     # Higher score implies higher probability of pixel being fg
@@ -206,7 +202,7 @@ def apply_bilateral(reference, target, confidence, thresh=0.7, plot=False):
     c_filt = grid.filter(c)
     output_filter = (tc_filt / c_filt).reshape(im_shape)
     output_solver = BilateralSolver(grid, bs_params).solve(t, c).reshape(im_shape)
-    #output_solver = (output_solver -  np.min(output_solver))/ (np.max(output_solver)- np.min(output_solver))
+    output_solver = (output_solver -  np.min(output_solver))/ (np.max(output_solver)- np.min(output_solver))
     
     if not np.any(np.isnan(output_solver)) and not np.any(np.isinf(output_solver)) :
         output_solver = fit_samples(output_solver.reshape(-1,1))
@@ -216,15 +212,17 @@ def apply_bilateral(reference, target, confidence, thresh=0.7, plot=False):
    
     output_solver = get_largest_blob(output_solver>thresh)
     if plot:
+        plt.rcParams['image.cmap'] = 'Greens'
         f, (ax1, ax2, ax3) = plt.subplots(1,3)
-        ax1.imshow(t.reshape(im_shape))
-        ax1.imshow(reference,alpha=0.5)
-        ax1.set_title('input')
-        ax2.imshow(output_filter)
-        ax2.set_title('bilateral filter')
-        ax3.imshow(output_solver)
-        ax3.imshow(reference,alpha=0.5)
-        ax3.set_title('bilateral solver')
+        ax1.imshow(reference)
+        ax1.set_title('Input')
+        ax1.axis('off')
+        ax2.imshow(cv2.bitwise_and(reference,reference,mask = np.array(t.reshape(im_shape)>0,dtype=np.uint8)))
+        ax2.set_title('Mask from PixelObjectness')
+        ax2.axis('off')
+        ax3.imshow(cv2.bitwise_and(reference,reference,mask = output_solver))
+        ax3.set_title('Cleaned mask')
+        ax3.axis('off')
         plt.show()
 
     return output_solver
