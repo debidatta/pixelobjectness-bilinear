@@ -1,6 +1,8 @@
 # Pixel Objectness with Bilinear Filtering
 
-This code is mostly adapted from [Pixel Objectness](https://github.com/suyogduttjain/pixelobjectness/) and [Fast Bilateral Solver](https://github.com/poolio/bilateral_solver). This uses Bilateral filtering as quick post processing step to clean the object masks produced by the Pixel Objectness Code. 
+This code is mostly adapted from [Pixel Objectness](https://github.com/suyogduttjain/pixelobjectness/) and [Fast Bilateral Solver](https://github.com/poolio/bilateral_solver). This uses Bilateral filtering as quick post processing step to clean the object masks produced by the Pixel Objectness Code. For example,
+
+![example](https://raw.githubusercontent.com/debidatta/pixelobjectness-bilinear/master/result.png)
 
 # Pixel Objectness
 The following repository contains pretrained model for pixel objectness.
